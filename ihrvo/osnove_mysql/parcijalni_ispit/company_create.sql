@@ -75,11 +75,33 @@ INSERT INTO employee_department (employee_id, department_id) VALUES
 SELECT CONCAT (employee_name, ' ', employee_surname) AS 'Ime i prezime', salary AS 'Placa'
 FROM employee;
 
+-- +----------------+---------+
+-- | Ime i prezime  | Placa   |
+-- +----------------+---------+
+-- | Ivo Ivic       |  850.00 |
+-- | Pero Peric     |  950.00 |
+-- | Mato Matic     | 1050.00 |
+-- | Stipo Stipic   | 1550.00 |
+-- | Mara Maric     | 1000.00 |
+-- | Mateja Matejic |  900.00 |
+-- | Petra Petric   | 1030.00 |
+-- | Kreso Kresic   | 1200.00 |
+-- | Jakov Jakovic  | 1500.00 |
+-- | Zoran Zoric    |  700.00 |
+-- | Ivan Ivanic    | 1000.00 |
+-- +----------------+---------+
+
 -- Dohvatite sve voditelje odjela i izračunajte prosjek njihovih plaća
 
 SELECT ROUND(SUM(e.salary) / COUNT(e.id),2) AS 'Prosjecna placa voditelja'
 FROM employee e
 JOIN department d ON d.leader = e.id;
+
+-- +---------------------------+
+-- | Prosjecna placa voditelja |
+-- +---------------------------+
+-- |                   1360.00 |
+-- +---------------------------+
 
 -- Kreirajte proceduru koja će računati prosjek plaća svih zaposlenika.
 
@@ -94,14 +116,39 @@ FROM employee;
 END $$
 DELIMITER ;
 
+-- +-----------------+
+-- | Prosjecna placa |
+-- +-----------------+
+-- |         1066.36 |
+-- +-----------------+
+
 -- SQL primjeri
 
 -- Zaposlenici po odjelima
 
-SELECT CONCAT (e.employee_name, ' ', e.employee_surname) AS 'Djelatnik', d.department_name AS 'Naziv odjela'
+SELECT CONCAT (e.employee_name, ' ', e.employee_surname) AS Djelatnik, d.department_name AS 'Naziv odjela'
 FROM employee e
 JOIN employee_department ed ON e.id = ed.employee_id
-JOIN department d ON d.id = ed.department_id;
+JOIN department d ON d.id = ed.department_id
+GROUP BY Djelatnik, d.department_name;
+
+-- +----------------+--------------+
+-- | Djelatnik      | Naziv odjela |
+-- +----------------+--------------+
+-- | Ivo Ivic       | Sale         |
+-- | Pero Peric     | Sale         |
+-- | Mato Matic     | Sale         |
+-- | Stipo Stipic   | Sale         |
+-- | Ivo Ivic       | Marketing    |
+-- | Stipo Stipic   | Marketing    |
+-- | Mara Maric     | Finance      |
+-- | Mateja Matejic | Finance      |
+-- | Petra Petric   | Finance      |
+-- | Kreso Kresic   | Warehouse    |
+-- | Jakov Jakovic  | IT           |
+-- | Zoran Zoric    | IT           |
+-- | Ivan Ivanic    | IT           |
+-- +----------------+--------------+
 
 -- voditelji po odjelima
 
@@ -109,3 +156,12 @@ SELECT d.department_name AS 'Naziv odjela', CONCAT (e.employee_name, ' ', e.empl
 FROM department d
 JOIN employee e ON e.id = d.leader;
 
+-- +--------------+---------------+
+-- | Naziv odjela | Voditelj      |
+-- +--------------+---------------+
+-- | Sale         | Stipo Stipic  |
+-- | Marketing    | Stipo Stipic  |
+-- | Finance      | Mara Maric    |
+-- | Warehouse    | Kreso Kresic  |
+-- | IT           | Jakov Jakovic |
+-- +--------------+---------------+
