@@ -37,13 +37,38 @@ INSERT INTO employee (employee_name, employee_surname, employee_address, phone, 
     ('Pero', 'Peric', 'Ulica neka 2', '091545455', 'pero@peric.com', 950.00),
     ('Mato', 'Matic', 'Ulica neka 3', '0982634564', 'mato@matic.com', 1050.00),
     ('Stipo', 'Stipic', 'Ulica neka 4', '091866464', 'stipo@stipic.com', 1550.00),
-    ('Mara', 'Maric', 'Ulica neka 5', '0975474564', 'mara@maric.com', 1000.00);
+    ('Mara', 'Maric', 'Ulica neka 5', '0975474564', 'mara@maric.com', 1000.00),
+    ('Mateja', 'Matejic', 'Ulica neka 6', '0975264234', 'mateja@matejic.com', 900.00),
+    ('Petra', 'Petric', 'Ulica neka 7', '091455564', 'petra@petric.com', 1030.00),
+    ('Kreso', 'Kresic', 'Ulica neka 8', '095645635', 'kreso@kresic.com', 1200.00),
+    ('Jakov', 'Jakovic', 'Ulica neka 9', '0995435464', 'jakov@jakovic.com', 1500.00),
+    ('Zoran', 'Zoric', 'Ulica neka 10', '098948864', 'zorana@zoric.com', 700.00),
+    ('Ivan', 'Ivanic', 'Ulica neka 1', '098765433', 'ivan@ivic.com', 1000.00);
 
 INSERT INTO department (department_name, leader) VALUES
     ('Sale', 4),
     ('Marketing', 4),
     ('Finance', 5),
-    ('IT', 3);
+    ('Warehouse', 8),
+    ('IT', 9);
+
+INSERT INTO employee_department (employee_id, department_id) VALUES
+    (1, 1),
+    (1, 2),
+    (2, 1),
+    (2, 1),
+    (3, 1),
+    (4, 1),
+    (4, 2),
+    (5, 3),
+    (6, 3),
+    (7, 3),
+    (8, 4),
+    (9, 5),
+    (10, 5),
+    (11, 5);
+
+
 
 -- Dohvatite sve zaposlenike i njihove plaće.
 
@@ -68,3 +93,19 @@ FROM employee;
 
 END $$
 DELIMITER ;
+
+-- SQL primjeri
+
+-- Zaposlenici po odjelima
+
+SELECT CONCAT (e.employee_name, ' ', e.employee_surname) AS 'Djelatnik', d.department_name AS 'Naziv odjela'
+FROM employee e
+JOIN employee_department ed ON e.id = ed.employee_id
+JOIN department d ON d.id = ed.department_id;
+
+-- voditelji po odjelima
+
+SELECT d.department_name AS 'Naziv odjela', CONCAT (e.employee_name, ' ', e.employee_surname) AS 'Voditelj'
+FROM department d
+JOIN employee e ON e.id = d.leader;
+
