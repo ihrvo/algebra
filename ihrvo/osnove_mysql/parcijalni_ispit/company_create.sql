@@ -110,7 +110,7 @@ DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS izracunaj_prosjecnu_placu() 
 BEGIN
 
-SELECT AVG(salary) AS 'Prosjecna placa' FROM employee;
+SELECT ROUND(AVG(salary), 2) AS 'Prosjecna placa' FROM employee;
 
 END $$
 DELIMITER ;
