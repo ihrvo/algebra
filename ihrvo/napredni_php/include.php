@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 class Baza {
     private string $host = "localhost";
     private string $user = "algebra";
-    private string $password = "AlgebrA2024!?";
+    private string $password = "algebra";
     private string $database = "videoteka";
     private $connection;
 
