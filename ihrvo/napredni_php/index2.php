@@ -1,101 +1,126 @@
 
 <?php
 
-function dd($var)
-{
-    echo '<pre>';
-    var_dump($var);
-    echo '</pre>';
-    die();
-}
-
 $connection = mysqli_connect('localhost', 'algebra', 'AlgebrA2024!?', 'videoteka');
 
 if($connection === false){
     die("Connection failed: ". mysqli_connect_error());
 }
 
-const QUERY = [
-    'popularMovies'
-        => "SELECT
-            f.naslov AS naslov_filma,
-            f.godina AS godina_filma,
-            z.ime AS zanr,
-            c.tip_filma,
-            COUNT(f.id) AS broj_posudbi
-        FROM
-            filmovi f
-            JOIN zanrovi z ON f.zanr_id = z.id
-            JOIN kopija k ON k.film_id = f.id
-            JOIN posudba_kopija pk ON pk.kopija_id = k.id
-            JOIN posudba ps ON pk.posudba_id = ps.id
-            JOIN cjenik c ON f.cjenik_id = c.id
-        WHERE ps.datum_posudbe > '2024-01-01'
-        GROUP BY k.film_id
-        ORDER BY broj_posudbi DESC
-        LIMIT 3",
-    'moviesWithGenres'
-        => "SELECT
-                f.naslov AS naslov_filma,
-                f.godina AS godina_filma,
-                z.ime AS zanr,
-                c.tip_filma
+
+$sqlFilmoviPoZanrovima = "
+    SELECT z.ime AS zanr, f.naslov AS film 
+    FROM
+    filmovi f
+    JOIN zanrovi z ON z.id = f.zanr_id;
+    ";
+$filmoviPoZanrovima = mysqli_query($connection, $sqlFilmoviPoZanrovima);
+
+if (mysqli_num_rows($filmoviPoZanrovima) === 0) {
+    die("There are no results for this query in our database!");
+}
+$filmoviPoZanrovima = mysqli_fetch_all($filmoviPoZanrovima, MYSQLI_ASSOC);
+// echo "<pre>";
+// var_dump($filmoviPoZanrovima);
+// echo "</pre>";
+// die();
+
+
+
+function  filmoviPoZanrovima() { // spajanje na bazu je unutra funkcije jer ne stignem potražiti bolje rješenje, ali sigurno ga ima
+
+        $connection = mysqli_connect('localhost', 'algebra', 'AlgebrA2024!?', 'videoteka'); 
+
+        if($connection === false){
+            die("Connection failed: ". mysqli_connect_error());
+        }
+
+        $sqlFilmoviPoZanrovima = "
+            SELECT z.ime AS zanr, f.naslov AS film 
             FROM
-                zanrovi z
-                JOIN filmovi f ON f.zanr_id = z.id
-                JOIN cjenik c ON f.cjenik_id = c.id",
-    'combined'
-        => "SELECT 
-            genre_name,
-            movie_title,
-            movie_year
-        FROM (
-            SELECT 
-                zanrovi.ime AS genre_name,
-                filmovi.naslov AS movie_title,
-                filmovi.godina AS movie_year,
-                ROW_NUMBER() OVER (PARTITION BY zanrovi.ime ORDER BY filmovi.naslov) as rn
-            FROM 
-                filmovi
-            JOIN 
-                zanrovi ON filmovi.zanr_id = zanrovi.id
-        ) as delivery_table
-        WHERE rn <= 5
-        ORDER BY genre_name, movie_title"
-];
+            filmovi f
+            JOIN zanrovi z ON z.id = f.zanr_id;
+            ";
+        $filmoviPoZanrovima = mysqli_query($connection, $sqlFilmoviPoZanrovima);
 
-function getData(mysqli $connection, $sql): array
-{
-    $result = mysqli_query($connection, $sql);
-
-    if (mysqli_num_rows($result) === 0) {
-        return ['error' => "nema podataka za upit"];// TODO: refactor this
-    }
-
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+        if (mysqli_num_rows($filmoviPoZanrovima) === 0) {
+            die("There are no results for this query in our database!");
+        }
+        $filmoviPoZanrovima = mysqli_fetch_all($filmoviPoZanrovima, MYSQLI_ASSOC);
+        $numItems = count($filmoviPoZanrovima);
+        $return = "<h2>Filmovi po žanrovima</h2>";
+        $old = null; // za provjeru kada je novi žanr
+        $i = 0;
+        $z = 1; // ako ima više od 3 filma
+        $divEnd = '</ul>
+                    <a href="/napredni_php/'. $zanrFilm['zanr'] .'.php" class="btn btn-outline-light mt-auto" type="button">Vidi sve</a>
+                    </div>
+                    </div>
+                    ';
+        foreach ($filmoviPoZanrovima as $zanrFilm):
+        if ($old !== $zanrFilm['zanr'])  {
+            if ($i !== 0) $return .= $divEnd;
+            $return .= '<div class="col mb-1">
+            <div class="h-100 p-5 text-bg-dark rounded-3 ">
+            <h2>'. $zanrFilm['zanr'] .'</h2>
+            <ul class="list-group my-3">';
+            $z = 0;
+        }
+        if ($z < 3) {
+            $return .= '<li class="list-group-item">'. $zanrFilm['film'] .'</li>';
+        }
+        $old = $zanrFilm['zanr'];
+        if ($i === array_key_last($filmoviPoZanrovima)) $return .= $divEnd;
+        $i++;
+        $z++;
+        endforeach;
+    echo $return;
+    mysqli_close($connection);
 }
 
-$popularMovies = getData($connection, QUERY['popularMovies']);
-$moviesWithGenres = getData($connection, QUERY['moviesWithGenres']);
-$moviesByGenre = [];
+// <div class="row align-items-md-stretch">
+//                     <div class="col-md-6">
+//                         <div class="h-100 p-5 text-bg-dark rounded-3">
+//                         <h2>Change the background</h2>
+//                         <p>Swap the background-color utility and add a `.text-*` color utility to mix up the jumbotron look. Then, mix and match with additional component themes and more.</p>
+//                         <button class="btn btn-outline-light" type="button">Example button</button>
+//                         </div>
+//                     </div>
 
-foreach ($moviesWithGenres as $key => $movie) {
-    $genreName = $movie['zanr'];
+// KRAJ
+$sql = "SELECT
+    f.naslov AS naslov_filma,
+    f.godina AS godina_filma,
+    z.ime AS zanr,
+    COUNT(f.id) AS broj_posudbi
+FROM
+    filmovi f
+    JOIN zanrovi z ON f.zanr_id = z.id
+    JOIN kopija k ON k.film_id = f.id
+    JOIN posudba_kopija pk ON pk.kopija_id = k.id
+    JOIN posudba ps ON pk.posudba_id = ps.id
+WHERE ps.datum_posudbe > '2024-01-01'
+GROUP BY k.film_id
+ORDER BY broj_posudbi DESC
+LIMIT 3;";
 
-    if(!isset($moviesByGenre[$genreName])){
-        $moviesByGenre[$genreName] = [];
+$result = mysqli_query($connection, $sql);
 
-    }
-
-    if (count($moviesByGenre[$genreName]) < 5){
-        $moviesByGenre[$genreName][] = $movie;
-    }
+if (mysqli_num_rows($result) === 0) {
+    die("There are no results for this query in our datbase!");
 }
-// dd($moviesByGenre);
 
+$popularMovies = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
+$sqlZanrovi = "SELECT f.*, z.ime as zanr from filmovi f JOIN zanrovi z ON f.zanr_id = z.id;";
+$result = mysqli_query($connection, $sqlZanrovi);
+
+if (mysqli_num_rows($result) === 0) {
+    die("There are no results for this query in our datbase!");
+}
+$filmoviPoZanrovima = mysqli_fetch_all($result, MYSQLI_ASSOC);
 mysqli_close($connection);
-
+// var_dump($filmoviPoZanrovima); die();
 
 ?>
 
@@ -120,7 +145,7 @@ mysqli_close($connection);
                     
                     <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 flex-grow-1">
                         <li><a href="#" class="nav-link px-2 text-secondary">Home</a></li>
-                        <li><a href="/members.php" class="nav-link px-2 text-dark">Dashboard</a></li>
+                        <li><a href="#" class="nav-link px-2 text-dark">Features</a></li>
                         <li><a href="#" class="nav-link px-2 text-dark">Pricing</a></li>
                         <li><a href="#" class="nav-link px-2 text-dark">FAQs</a></li>
                         <li><a href="#" class="nav-link px-2 text-dark">About</a></li>
@@ -135,49 +160,30 @@ mysqli_close($connection);
         <main>
             <div class="container py-4">
                 <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-                    <div class="container-fluid">
+                    <div class="container-fluid py-5">
                         <h1 class="display-5 fw-bold">Najpopularniji filmovi</h1>
 
-                        <ul class="list-group my-5">
+                        <ul class="list-group my-3">
                             <?php foreach ($popularMovies as $movie): ?>
-                                <li class="list-group-item bg-body-tertiary">
+                                <li class="list-group-item">
                                     <?= $movie['naslov_filma'] ?> (<?= $movie['godina_filma'] ?>) - <?= $movie['zanr'] ?>
-                                    <span class="badge text-bg-primary float-end"><?= $movie['tip_filma']?></span>
+                                    <span class="badge text-bg-primary float-end">Hit</span>
                                 </li>
                             <?php endforeach ?>
                         </ul>
 
-                        <button class="btn btn-outline-secondary" type="button">Vidi sve!</button>
-                    </div>
-                </div>             
-                
-                <div class="p-5 mb-4 bg-body-tertiary rounded-3">
-                    <div class="container-fluid">
-                        <h1 class="display-5 fw-bold">Zanrovi</h1>
-
-                        <div class="d-grid gap-3 mt-5" style="grid-template-columns: 1fr 1fr 1fr;">
-                            <?php $counter = 0 ?>
-                            <?php foreach ($moviesByGenre as $key => $moviesInGenre): ?>
-                                <?php 
-                                    $isEven = $counter % 2 == 0;
-                                    $counter++;
-                                ?>
-                                <div class="h-100 p-5 <?= $isEven ? 'text-bg-dark' : 'bg-body-tertiary border' ?> rounded-3">
-                                    <h2><?= $key ?></h2>
-                                    <ul class="list-group my-4">
-                                        <?php foreach ($moviesInGenre as $movie): ?>
-                                            <li class="list-group-item <?= $isEven ? 'text-bg-dark' : 'bg-body-tertiary' ?>">
-                                                <?= $movie['naslov_filma'] ?> (<?= $movie['godina_filma'] ?>) - <?= $movie['zanr'] ?>
-                                                <span class="badge text-bg-primary float-end"><?= $movie['tip_filma']?></span>
-                                            </li>
-                                        <?php endforeach ?>
-                                    </ul>
-                                    <button class="btn <?= $isEven ? 'btn-outline-light' : 'btn-outline-secondary' ?>" type="button">Vidi vise!</button>
-                                </div>
-                            <?php endforeach ?>
-                        </div>
+                        <button class="btn btn-primary btn-lg" type="button">Vidi sve!</button>
                     </div>
                 </div>
+                    
+                 <div class="row align-items-md-stretch">
+                    <?php 
+                    filmoviPoZanrovima();
+                    ?>
+
+                    
+                </div>
+                
 
                 <footer class="py-3">
                     <ul class="nav justify-content-center border-bottom pb-3 mb-3">
