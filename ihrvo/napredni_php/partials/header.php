@@ -12,6 +12,7 @@
   <body>
     <div class="page-wrapper d-flex h-100">
 
+    <?php include_once './../inc/postaviAktivnuKlasu.php' ?>
         <?php include_once 'sidebar.php' ?>
         
         <div class="content d-flex flex-column flex-grow-1">
