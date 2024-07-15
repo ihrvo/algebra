@@ -1,15 +1,7 @@
 <?php include_once 'partials/header.php' ?>
 
 <main class="container my-3 d-flex flex-column flex-grow-1">
-    <div class="title flex-between">
-        <h1>Članovi</h1>
-        <div class="action-buttons">
-            <a href="/controllers/members-create.php" type="submit" class="btn btn-primary">+ Novi član</a>
-        </div>
-    </div>
-
-    <hr>
-    <?php showNotification(); ?>
+    <h1>Clanovi</h1>
     <table class="table table-striped">
         <thead>
             <tr>
