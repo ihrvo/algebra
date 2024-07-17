@@ -25,9 +25,9 @@ class Vlasnik {
     }
 }
 
-$modelS = new Car('Tesla', 'Model S', 'Electric', 2300, 'cestovno', 'B');
+$modelS = new Car('Tesla', 'Model S', 'Electric', 2300);
 
-$model3 = new Car('Tesla', 'Model 3', 'Electric', 1800, 'cestovno', 'B');
+$model3 = new Car('Tesla', 'Model 3', 'Electric', 1800);
 
 $tena = new Vlasnik('Tena', 'Fiskus', 31, 'Zensko', [$modelS, $model3]);
 // dd($tena);

@@ -34,22 +34,6 @@ function redirect($path)
     exit();
 }
 
-function showNotification() {
-    if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['message'])){
-        if($_GET['message']) {
-            $message = $_GET['message'];
-            switch ($message) {
-                case 1:
-                    echo '<div class="alert alert-success" role="alert">Zapis je dodan u bazu!</div>';
-                    break;
-                case 2:
-                    echo '<div class="alert alert-danger" role="alert">Zapis već postoji u bazi!</div>';
-                    break;
-            }
-        }
-    }
-    }
-
 // // autoload classes
 // spl_autoload_register(function ($class_name) {
 //     $class_name = str_replace('\\', DIRECTORY_SEPARATOR, $class_name);
