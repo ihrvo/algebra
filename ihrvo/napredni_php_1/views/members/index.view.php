@@ -1,4 +1,8 @@
-<?php include_once base_path('views/partials/header.php'); ?>
+<?php include_once base_path('views/partials/header.php'); 
+$uri = urldecode(ltrim(parse_url($_SERVER['REQUEST_URI'])["path"], '/'));
+$uri = explode('/',$uri);
+echo $uri[0];
+?>
 
 <main class="container my-3 d-flex flex-column flex-grow-1">
     <div class="title flex-between">
