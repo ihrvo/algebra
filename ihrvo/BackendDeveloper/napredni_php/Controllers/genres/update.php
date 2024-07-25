@@ -1,32 +1,27 @@
 <?php
 
 use Core\Database;
+use Core\Validator;
 
 if (!isset($_POST['id'] ) || !isset($_POST['_method']) || $_POST['_method'] !== 'PATCH') {
     abort();
 }
 
-//TODO: do a validation
-    
-$data = [
-    "id" => $_POST['id'],
-    "zanr" => $_POST['zanr'],
+$rules = [
+    'id' => ['required', 'numeric'],
+    'ime' => ['required', 'string', 'min:3', 'max:100', 'unique:zanrovi']
 ];
 
-$db = new Database();
-$genres = $db->query('SELECT * FROM zanrovi WHERE id = ?', [$_POST['id']]);
+$db = Database::get();
 
-if(empty($genres)){
-    abort();
+$form = new Validator($rules, $_POST);
+if ($form->notValid()){
+    dd($form->errors());
 }
 
-try {
-    $sql = "UPDATE zanrovi SET ime = ? WHERE id = ?";
-    $db->query($sql, [$data['zanr'], $data['id']]);
+$data = $form->getData();
 
-    redirect('genres');
-} catch (PDOException $e) {
-    // log the error
-    echo "<p>There was an error processing your request. Please try again.</p>";
-    throw $e;
-}
+$sql = "UPDATE zanrovi SET ime = ? WHERE id = ?";
+$db->query($sql, [$data['ime'], $data['id']]);
+
+redirect('genres');

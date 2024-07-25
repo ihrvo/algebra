@@ -3,10 +3,13 @@
 namespace Core;
 
 use PDO;
+use PDOStatement;
 
 class Database {
 
-    private $pdo;
+    private PDO $pdo;
+    private PDOStatement $statement;
+    private static ?Database $instance = null;
 
     public function __construct()
     {
@@ -20,17 +23,50 @@ class Database {
         }
     }
 
+    //Singleton design pattern
+    public static function get(): Database
+    {
+        if (self::$instance === null) {
+            self::$instance = new Database();
+        }
+
+        return self::$instance;
+    }
+
     public function query($sql, $params = [])
     {
-        $statement = $this->pdo->prepare($sql);
-        $statement->execute($params);
-    
-        return $statement;
+        $this->statement = $this->pdo->prepare($sql);
+
+        try {
+            $this->statement->execute($params);
+        } catch (\PDOException $e) {
+            if($e->errorInfo[1] === 1451){
+                die("Ne mozete obrisati resurs jer se resurs jos koristi.");
+            }
+            die('Something went wrong, please try again ' . $e->getMessage());
+        }
+       
+        return $this;
     }
 
-    public function fetch($sql, $params = [])
+    public function find()
     {
-       return $this->query($sql, $params)->fetch();
+       return $this->statement->fetch();
     }
 
+    public function all()
+    {
+       return $this->statement->fetchAll();
+    }
+
+    public function findOrFail()
+    {
+        $data = $this->find();
+
+        if (empty($data)) {
+            abort();
+        }
+
+        return $data;
+    }
 }

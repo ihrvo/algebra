@@ -2,14 +2,10 @@
 
 use Core\Database;
 
-$db = new Database();
+$db = Database::get();
+$sql = "SELECT * from clanovi ORDER BY id";
+$members = $db->query($sql)->all();
 
-try {
-    $sql = "SELECT * from clanovi ORDER BY id";
-    $members = $db->query($sql);
-} catch (\Exception $exception) {
-    die("Connection failed: {$exception->getmessage()}");
-}
 
 $pageTitle = 'Clanovi';
 

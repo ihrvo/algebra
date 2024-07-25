@@ -14,7 +14,6 @@
             <tr>
                 <th>Id</th>
                 <th>Ime</th>
-                <th>Prezime</th>
                 <th>Adresa</th>
                 <th>Telefon</th>
                 <th>Email</th>
@@ -26,15 +25,22 @@
             <?php foreach ($members as $member): ?>
                 <tr>
                     <td><?= $member['id'] ?></td>
-                    <td><a href="/members/show?id=<?= $member['id'] ?>"><?= $member['ime'] ?></a></td>
-                    <td><a href="/members/show?id=<?= $member['id'] ?>"><?= $member['prezime'] ?></a></td>
+                    <td>
+                        <a href="/members/show?id=<?= $member['id'] ?>">
+                            <?= $member['ime'] ?> <?= $member['prezime'] ?>
+                        </a>
+                    </td>
                     <td><?= $member['adresa'] ?></td>
                     <td><?= $member['telefon'] ?></td>
                     <td><?= $member['email'] ?></td>
                     <td><?= $member['clanski_broj'] ?></td>
                     <td>
                         <a href="/members/edit?id=<?= $member['id'] ?>" class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit Member"><i class="bi bi-pencil"></i></a>
-                        <button class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete Member"><i class="bi bi-trash"></i></button>
+                        <form action="/members/destroy" method="POST" class="d-inline">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="id" value="<?= $member['id'] ?>">
+                            <button type="submit" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete Member"><i class="bi bi-trash"></i></button>
+                        </form>
                     </td>
                 </tr>
             <?php endforeach ?>

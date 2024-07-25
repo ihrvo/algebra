@@ -1,5 +1,8 @@
 <?php
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 function dump($var)
 {
     echo '<pre>';
@@ -29,19 +32,37 @@ function abort($code = 404)
 
 function redirect($path)
 {
-    header("Location:/$path");
+    header("location:/$path");
     exit();
 }
 
-function isCurrent(string $link, $defaultReturn = "active"): string
+function goBack(): void
+{
+    header("location: {$_SERVER['HTTP_REFERER']}");
+    exit();
+}
+
+//TODO: move to a Helper calss next 3 functions
+function isCurrent(string $link): bool
 {
     $uri = parse_url($_SERVER['REQUEST_URI'])['path'];
-    $link = "/" . $link;
 
-    if (str_starts_with($uri, $link)){
-        return $defaultReturn;
-    } else {
-        return '';
+    if($uri === $link){
+        return true;
     }
+    
+    $route = explode('/', $uri)[1];
+
+    return $route === $link;
+}
+
+function setActiveCalss(string $link): string
+{
+    return isCurrent($link) ? 'active' : '';
+}
+
+function setAriaCurent(string $link): string
+{
+    return isCurrent($link) ? 'aria-curent="page"' : 'aria-curent="false"';
 }
 

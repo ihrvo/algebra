@@ -9,7 +9,7 @@
             <label for="zanr" class="mt-1">Naziv Zanra</label>
         </div>
         <div class="col-6">
-            <input type="text" class="form-control" id="zanr" name="zanr">
+            <input type="text" class="form-control" id="zanr" name="ime">
         </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-primary mb-3">Spremi</button>

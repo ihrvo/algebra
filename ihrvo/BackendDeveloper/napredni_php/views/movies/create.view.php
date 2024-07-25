@@ -10,15 +10,15 @@
     <form class="row g-3 mt-3" action="/movies/store" method="POST">
         <div class="col-md-6">
             <label for="title" class="form-label">Naslov</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Naslov" required>
+            <input type="text" class="form-control" id="title" name="naslov" placeholder="Naslov" required>
         </div>
         <div class="col-md-6">
             <label for="year" class="form-label">Godina</label>
-            <input type="text" class="form-control" id="year" name="year" placeholder="Godina" required>
+            <input type="text" class="form-control" id="year" name="godina" placeholder="Godina" required>
         </div>
         <div class="col">
             <label for="movie_year" class="form-label ps-1">Žanr</label>
-            <select class="form-select" aria-label="Default select example" name="genre">
+            <select class="form-select" aria-label="Default select example" name="zanr_id">
                 <option selected>Odaberite zanr</option>
                 <?php foreach ($genres as $genre): ?>
                     <option value="<?= $genre['id'] ?>"><?= $genre['ime'] ?></option>
@@ -27,7 +27,7 @@
         </div>
         <div class="col">
             <label for="movie_year" class="form-label ps-1">Cjenik</label>
-            <select class="form-select" aria-label="Default select example" name="price">
+            <select class="form-select" aria-label="Default select example" name="cjenik_id">
                 <option selected>Odaberite cijenu</option>
                 <?php foreach ($prices as $priceItem): ?>
                     <option value="<?= $priceItem['id'] ?>"><?= $priceItem['tip_filma'] . " - Cijena " .  $priceItem['cijena'] . " EUR - Zakasnina " . $priceItem['zakasnina_po_danu'] . " EUR"?></option>

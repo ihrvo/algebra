@@ -1,45 +1,37 @@
 <?php
 
 use Core\Database;
+use Core\Validator;
 
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
-    
-    $data = [
-        "ime" => $_POST['title'],
-        "godina" => $_POST['year'],
-        "zanr" => $_POST['genre'],
-        "cijena" => $_POST['price'],
-    ];
-
-    foreach ($data as $key => $value) {
-        // Provjera ima li praznih polja
-        if(empty($value)){
-            dd("Polje $key ne smije biti prazno");
-        }
-        if($data['zanr'] === "Odaberite zanr"){
-            dd("Odaberite Zanr");
-        }
-        if($data['cijena'] === "Odaberite cijenu"){
-            dd("Odaberite cijenu");
-        }
-    }
-
-    $db = new Database();
-    
-    $sql = "INSERT INTO filmovi (naslov, godina, zanr_id, cjenik_id) VALUES (:naslov, :godina, :zanr_id, :cjenik_id)";
-
-    try {
-        $db->query($sql, [
-            'naslov' => $data['ime'],
-            'godina' => $data['godina'],
-            'zanr_id' => $data['zanr'],
-            'cjenik_id' => $data['cijena']
-        ]);
-    } catch (\Throwable $th) {
-        throw $th;
-    }
-
-    redirect('movies');
-} else {
+if($_SERVER['REQUEST_METHOD'] !== 'POST'){
     dd('Unsupported method!');
 }
+    
+$rules = [
+    'naslov' => ['required', 'string', 'min:2', 'max:100'],
+    'godina' => ['required', 'numeric', 'min:4', 'max:4'],
+    'zanr_id' => ['required', 'numeric'],
+    'cjenik_id' => ['required', 'numeric']
+];
+
+
+$db = Database::get();
+
+$form = new Validator($rules, $_POST);
+if ($form->notValid()){
+    dd($form->errors());
+}
+
+$data = $form->getData();
+// dd($data);
+
+$sql = "INSERT INTO filmovi (naslov, godina, zanr_id, cjenik_id) VALUES (:naslov, :godina, :zanr_id, :cjenik_id)";
+
+$db->query($sql, [
+    'naslov' => $data['naslov'],
+    'godina' => $data['godina'],
+    'zanr_id' => $data['zanr_id'],
+    'cjenik_id' => $data['cjenik_id']
+]);
+
+redirect('movies');

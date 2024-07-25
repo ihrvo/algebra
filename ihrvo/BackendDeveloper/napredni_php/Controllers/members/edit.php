@@ -6,14 +6,12 @@ if (!isset($_GET['id'])) {
     abort();
 }
 
-$db = new Database();
+$db = Database::get();
 
-$member = $db->fetch('SELECT * FROM clanovi WHERE id = ?', [$_GET['id']]);
+$sql = 'SELECT * from clanovi WHERE id = :id';
+$member = $db->query($sql, ['id' => $_GET['id']])->findOrFail();
 
-if(empty($member)){
-    abort();
-}
 
-$pageTitle = 'Promjena podataka člana';
+$pageTitle = "Uredi Clana";
 
 require base_path('views/members/edit.view.php');
